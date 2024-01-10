@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{% load staticfiles %}
+	<title>Lifestyle Page</title>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+   	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+   	<script type="text/javascript">
+   		$(document).ready(function() {
+   			$(document).on('click', function (){
+	   			$('#btnGetFood').click(function(){
+	   				var food_name = $('#foodnameLabel');
+	   				var serving_size = $('#servingsizeLabel');
+	   				var calories = $('#caloriesLabel');
+	   				var carbs = $('#carbsLabel');
+	   				var fats = $('#fatsLabel');
+	   				var protein = $('#proteinLabel');
+	   				var sugar = $('#sugarsLabel');
+	   				var tie = $('#tiefood');
+	   				$.ajax({
+	   					url: 'https://nutritionix-api.p.mashape.com/v1_1/search/' + $('#txtFood').val() + '?fields=item_name%2Cnf_calories%2Cnf_total_fat%2Cnf_protein%2Cnf_trans_fatty_acid%2Cnf_sugars%2Cnf_servings_per_container%2Cnf_total_carbohydrate',
+	   					method: 'get',
+	   					dataType: 'json',
+	   					headers: { "X-Mashape-Key": "ZQdVejWpzXmshdaZtQfKzwtGzxytp1rSizcjsnb1bGwELdPAIB" },
+	   					success: function (data){
+	   						food_name.html(data.hits[0].fields.item_name);
+	   						serving_size.html(data.hits[0].fields.nf_serving_size_qty);
+	   						calories.html(data.hits[0].fields.nf_calories);
+	   						carbs.html(data.hits[0].fields.nf_total_carbohydrate + " grams");
+	   						fats.html(data.hits[0].fields.nf_total_fat + " grams");
+	   						protein.html(data.hits[0].fields.nf_protein + " grams");
+	   						sugar.html(data.hits[0].fields.nf_sugars + " grams");
+	   						tie.val("Add " + $('#txtFood').val())
+	   					}
+	   				});
+	   			});
+	   		});
+   		});
+   	</script>
+</head>
+<body>
+	<div class="container">
+	    <div class="row">
+	      	<nav class="navbar navbar-inverse">
+	        	<div class="container-fluid">
+	          		<div class="navbar-header">
+	            		<a class="navbar-brand" href="#">The Black Squirrels Fitness Community</a>
+	            	</div>
+	          		<ul class="nav navbar-nav">
+	            		<li class="active"><a href="{% url 'fitness_app:lifestyle' %}">LIFESTYLE</a></li>
+	            		<li><a href="{% url 'fitness_app:index' %}">HOME</a></li>
+	            		<li><a href="{% url 'fitness_app:analysis' %}">ANALYSIS</a></li>
+	            		<li><a href="{% url 'fitness_app:community' %}">COMMUNITY</a></li>
+	            		<li><a href="{% url 'login_app:logout' %}">LOG OUT</a></li>
+	          		</ul>
+	        	</div>
+	      	</nav>
+	    </div>
+	    <div class="row">
+	    	<h2 class='text-center' style='margin-bottom: 35px;'>Lifestyle Page</h2>
+	    	<div class="col-md-4">
+	    		<h4 class='text-center'>User Attributes</h4>
+		    	<dl class="dl-horizontal">
+  					<dt>First Name</dt><dd>{{user.first_name}}</dd>
+  					<dt>Last Name</dt><dd>{{user.last_name}}</dd>
+  					<dt>Email</dt><dd>{{user.email}}</dd>
+  					<dt>Height</dt><dd>{{user.feet}}'{{user.inches}}"</dd>
+  					<dt>Age</dt><dd>{{user.age}}</dd>
+  					<dt>Weight</dt><dd>{{user.weight}} lbs</dd>
+  					<dt>Gender</dt><dd>{{user.gender}}</dd>
+  					<dt>Activity Level</dt><dd>{{actlvl}}</dd>
+  					<dt>Goal</dt><dd>{{gl}}</dd>
+  					<dt>BMR</dt><dd>{{bmr}}</dd>
+				</dl>
+				<form action="{% url 'fitness_app:quickweight' %}" method="post">
+		        	{% csrf_token %}
+		        	{{quickweight}}
+		        	<input type="submit" value="submit">
+	    		</form>
+		    </div>
+		    <div class="col-md-8">
+		    	<h4 class='text-center'>To {{gl}} at Different Activity Levels</h4>
+	    		<table class="table table-inverse">
+					<thead>
+				    	<tr>
+					    	<th>Choice 1: Sedentary </th>
+					    	<th>Choice 2: Lightly Active (exercise 1-3 days/week)</th>
+					    	<th>Choice 3: Moderatetely Active (moderate exercise/sports 3-5 days/week)</th>
+					    	<th>Choice 4: Very Active (hard exercise/sports 6-7 days a week)</th>
+					    	<th>Choice 5: Extra Active (very hard exercise/sports and physical job or 2x training)</th>
+				    	</tr>
+					</thead>
+				  	<tbody>
+				  		<tr>		
+			    			<td>{{sedentary}} Cal</td>
+			      			<td>{{light}} Cal</td>
+			      			<td>{{moderate}} Cal</td>
+			      			<td>{{very}} Cal</td>
+			      			<td>{{extreme}} Cal</td>
+						</tr>
+						<tr>
+							<form action = "{% url 'fitness_app:quickactivity' %}", method='post'>
+							{% csrf_token %}	
+								<td>{{quickactivity}}</td>
+								<td><input type='submit' value="Update (1-5)"></td>
+							</form>
+						</tr>
+				  	</tbody>
+				</table>
+				<h4 class='text-center'>Weight Manipulation at Different Caloric Levels Per Day</h4>
+				<table class="table table-inverse">
+					<thead>
+				    	<tr>
+					    	<th>Choice 1: Lose 2 lbs Per Week</th>
+					    	<th>Choice 2: Lose 1 lbs Per Week</th>
+					    	<th>Choice 3: Maintain</th>
+					    	<th>Choice 4: Gain 1 lbs Per Week</th>
+					    	<th>Choice 5: Gain 2 lbs Per Week</th>
+				    	</tr>
+					</thead>
+				  	<tbody>
+				  		<tr>
+				    		<td>{{loseTwo}} Cal</td>
+				      		<td>{{loseOne}} Cal</td>
+				      		<td>{{maintain}} Cal</td>
+				      		<td>{{gainOne}} Cal</td>
+				      		<td>{{gainTwo}} Cal</td>
+						</tr>
+						<tr>
+							<form action="{% url 'fitness_app:quickgoal' %}" method="post">
+								{% csrf_token %}
+								<td>{{quickgoal}}</td>
+								<td><input type='submit' value='Update Goal'></td>
+							</form>
+						</tr>
+				  	</tbody>
+				</table>
+		    </div>
+	    </div>
+	</div>
+</body>
+</html>
